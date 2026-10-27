@@ -1,0 +1,21 @@
+{
+  "vertex": "csequencer:screen_fx",
+  "fragment": "csequencer:screen_fx",
+  "attributes": [ "Position", "UV0" ],
+  "samplers": [ { "name": "Sampler0" } ],
+  "uniforms": [
+    { "name": "Time", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "ScreenSize", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] },
+    { "name": "Dizzy", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "Sleep", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "Heat", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "Cold", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "Insanity", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "Poison", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "Invert", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "Melt", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "Gray", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "Blood", "type": "float", "count": 1, "values": [ 0.0 ] },
+    { "name": "BloodTime", "type": "float", "count": 1, "values": [ 0.0 ] }
+  ]
+}

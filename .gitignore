@@ -1,0 +1,29 @@
+# Gradle / build output
+.gradle/
+build/
+core/build/
+out/
+bin/
+*.class
+
+# Minecraft dev runs (worlds, logs, screenshots, configs)
+run/
+run-data/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Old code kept only locally for reference (not compiled)
+removed-legacy/
+removed-template/

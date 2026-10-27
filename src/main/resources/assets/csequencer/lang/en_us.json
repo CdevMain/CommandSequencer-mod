@@ -1,0 +1,7 @@
+{
+  "key.categories.csequencer": "Command Sequencer",
+  "key.csequencer.hub": "Open Command Sequencer",
+  "key.csequencer.tasks": "Open Task Manager",
+  "key.csequencer.overlay": "Toggle compact sequence overlay",
+  "key.csequencer.areas": "Toggle trigger area viewer"
+}
