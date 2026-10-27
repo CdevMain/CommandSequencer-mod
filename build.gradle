@@ -178,6 +178,9 @@ tasks.named('processResources', ProcessResources).configure {
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
     }
+
+    // License notices of bundled libraries (JLayer is LGPL) travel with the jar.
+    from(rootProject.file('THIRD_PARTY_NOTICES.md')) { into 'META-INF' }
 }
 
 // Example for how to get properties into the manifest for reading at runtime.
