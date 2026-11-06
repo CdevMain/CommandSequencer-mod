@@ -676,6 +676,9 @@ public final class PieceRegistry {
 
         query("literal", "Value", C, ValueType.TEXT, null, false, "A constant value.", p("value", "Value", TEXT));
         query("template", "Text Template", C, ValueType.TEXT, null, false, "Text with {placeholders}.", p("text", "Text", TEXT));
+        query("seq.in_trigger_area", "Inside Trigger Area", S, ValueType.BOOL, null, false,
+                "True while the player is inside an area trigger of this sequence (drawn with ▣ Area). Use NOT to react when they leave.",
+                who(), pb("trigger", "Area trigger name (empty = any)", TEXT).def("").build());
         query("vec.offset", "Offset Position", C, ValueType.VEC3, null, false, "A position moved by dx, dy, dz (e.g. a checkpoint 20 blocks east of the start).",
                 p("base", "Position", QUERY), pb("dx", "dx", NUMBER).def(0).build(), pb("dy", "dy", NUMBER).def(0).build(), pb("dz", "dz", NUMBER).def(0).build());
         query("var", "Variable", C, ValueType.TEXT, null, false, "Reads a variable.",

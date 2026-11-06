@@ -151,6 +151,58 @@ public final class Examples {
         return b.p;
     }
 
+    // ── Importable templates (not auto-installed) ──────────────────────────
+
+    private static Trigger areaTrigger(String name) {
+        Trigger t = new Trigger();
+        t.id = "tr_area";
+        t.name = name;
+        t.kind = Policies.TriggerKind.AREA;
+        t.subject = Policies.TriggerSubject.EACH_PLAYER;
+        t.edge = Policies.EdgeMode.ENTERED;
+        t.intervalTicks = 10;
+        t.areaFrom = new int[]{0, 60, 0};
+        t.areaTo = new int[]{10, 70, 10};
+        return t;
+    }
+
+    /** Area that runs a command when a player walks in. Redraw the area after importing. */
+    public static Project areaCommand() {
+        B b = new B("template_area_command", "Area · Run Command",
+                "Runs a command when a player walks into the area. After importing: ⚙ Project → trigger 'Area' → ✎ Draw area in the world, "
+                        + "then edit the command and save. Cooldown: 5 s per player.",
+                "template", "area");
+        b.p.settings.scope = Policies.ExecutionScope.PLAYER;
+        b.p.settings.concurrency = Policies.ConcurrencyPolicy.IGNORE_NEW;
+        Trigger t = areaTrigger("Area");
+        t.cooldownTicks = 100;
+        b.p.triggers.add(t);
+        b.track(0, "Command");
+        b.add(0, 0, "action.command", "Command (edit me)", "command", "say {player} entered the area!", "as", "server");
+        b.add(0, 0, "action.actionbar", "Message to the player", "message", "You entered the area", "targets", target("tracked"));
+        return b.p;
+    }
+
+    /** Music that plays only while the player is inside the area, fading in and out. */
+    public static Project areaMusic() {
+        B b = new B("template_area_music", "Area · Music While Inside",
+                "Plays music only for the player inside the area and fades it out when they leave. After importing: "
+                        + "⚙ Project → trigger 'Area' → ✎ Draw area in the world; select the Play Audio piece and choose your music; save.",
+                "template", "area", "audio");
+        b.p.settings.scope = Policies.ExecutionScope.PLAYER;
+        b.p.settings.concurrency = Policies.ConcurrencyPolicy.IGNORE_NEW;
+        b.p.triggers.add(areaTrigger("Area"));
+        b.track(0, "Music");
+        b.track(1, "Leave check");
+        b.add(0, 0, "audio.play", "Music (choose your audio)", "targets", target("tracked"), "loop", true, "fadeInMs", 1500, "channel", "area");
+        b.add(1, 0, "flow.wait_until", "Wait until the player leaves the area",
+                "condition", cond(q("seq.in_trigger_area"), "is_false", null), "interval", 10);
+        b.add(1, 1, "audio.stop", "Fade the music out", "channel", "area", "fadeMs", 1500);
+        b.add(1, 2, "flow.delay", "Let the fade finish", "ticks", 30);
+        b.add(1, 3, "flow.end", "End", "message", "Left the area");
+        return b.p;
+    }
+
     // ── Example: madness ───────────────────────────────────────────────────
 
     public static Project madness() {

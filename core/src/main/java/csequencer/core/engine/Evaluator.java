@@ -145,6 +145,22 @@ final class Evaluator implements EvalContext.Resolver {
             case "seq.name": return Value.of(task.project.name);
             case "seq.initiator": return task.request.initiator == null ? Value.NULL : Value.of(task.request.initiator);
             case "seq.tracked": return task.tracked == null ? Value.NULL : Value.of(task.tracked);
+            case "seq.in_trigger_area": {
+                // Is the player inside one of this sequence's area triggers? (no need to repeat the coordinates)
+                String who = render(text(a, "who"), scope);
+                EntityRef p = !who.isEmpty() ? lookupEntity(who) : ctx.subject != null ? ctx.subject : task.tracked;
+                if (p == null || !p.player()) return Value.FALSE;
+                Vec3d pos = engine.platform.players().positionOf(p.uuid());
+                if (pos == null) return Value.FALSE;
+                String dim = engine.platform.players().dimensionOf(p.uuid());
+                String name = render(text(a, "trigger"), scope).trim();
+                for (csequencer.core.model.Trigger t : task.project.triggers) {
+                    if (t.kind != csequencer.core.model.Policies.TriggerKind.AREA || !t.hasArea()) continue;
+                    if (!name.isEmpty() && !name.equalsIgnoreCase(t.name)) continue;
+                    if (t.inArea(dim, pos.x(), pos.y(), pos.z())) return Value.TRUE;
+                }
+                return Value.FALSE;
+            }
             case "seq.phase": return Value.of(task.currentPhase());
             case "seq.participants": {
                 List<Value> out = new ArrayList<>();

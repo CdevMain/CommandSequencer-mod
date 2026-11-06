@@ -1,0 +1,113 @@
+{
+  "format": "commandsequencer.project",
+  "schemaVersion": 1,
+  "id": "template_area_command",
+  "name": "Area · Run Command",
+  "description": "Runs a command when a player walks into the area. After importing: ⚙ Project → trigger 'Area' → ✎ Draw area in the world, then edit the command and save. Cooldown: 5 s per player.",
+  "tags": [
+    "template",
+    "area"
+  ],
+  "revision": 0,
+  "settings": {
+    "scope": "PLAYER",
+    "concurrency": "IGNORE_NEW",
+    "disconnect": "CONTINUE",
+    "disconnectGraceTicks": 6000,
+    "recovery": "DISCARD",
+    "timing": "TICK",
+    "maxCatchUpTicks": 40,
+    "errorPolicy": "CONTINUE",
+    "priority": 0,
+    "announce": "ALL",
+    "announceTeams": [],
+    "preAnnounceTicks": 60,
+    "overlayKeepVisible": true,
+    "dimension": "",
+    "evalIntervalTicks": 1,
+    "lengthTicks": 0,
+    "trackedPlayer": ""
+  },
+  "main": {
+    "id": "tl_adt68da142",
+    "name": "Main",
+    "description": "",
+    "color": "#FF26A69A",
+    "inputs": [],
+    "outputs": [],
+    "tracks": [
+      {
+        "id": "t_qkw55r6xvb",
+        "name": "Command",
+        "color": "#FF3A6EA5",
+        "muted": false,
+        "collapsed": false,
+        "locked": false
+      }
+    ],
+    "pieces": [
+      {
+        "id": "p_4z963ka760",
+        "type": "action.command",
+        "track": "t_qkw55r6xvb",
+        "tick": 0,
+        "duration": 0,
+        "label": "Command (edit me)",
+        "enabled": true,
+        "params": {
+          "command": "say {player} entered the area!",
+          "as": "server"
+        }
+      },
+      {
+        "id": "p_ci8sqhbskk",
+        "type": "action.actionbar",
+        "track": "t_qkw55r6xvb",
+        "tick": 0,
+        "duration": 0,
+        "label": "Message to the player",
+        "enabled": true,
+        "params": {
+          "message": "You entered the area",
+          "targets": {
+            "mode": "tracked"
+          }
+        }
+      }
+    ],
+    "groups": [],
+    "markers": []
+  },
+  "functions": [],
+  "conditions": [],
+  "audio": [],
+  "triggers": [
+    {
+      "id": "tr_area",
+      "name": "Area",
+      "enabled": true,
+      "kind": "AREA",
+      "eventType": "player.join",
+      "edge": "ENTERED",
+      "subject": "EACH_PLAYER",
+      "cooldownTicks": 100,
+      "intervalTicks": 10,
+      "oncePerPlayer": false,
+      "oncePerServer": false,
+      "area": {
+        "dim": "",
+        "from": [
+          0,
+          60,
+          0
+        ],
+        "to": [
+          10,
+          70,
+          10
+        ]
+      }
+    }
+  ],
+  "variables": []
+}
