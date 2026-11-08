@@ -353,7 +353,7 @@ public final class Examples {
 
     // ── Example: boss fight ────────────────────────────────────────────────
 
-    static Project bossFight() {
+    public static Project bossFight() {
         B b = new B("example_boss_fight", "Example · Boss Fight",
                 "A complete boss fight around the player who starts it: cinematic intro, a boss with a boss bar that follows its health, "
                         + "a waypoint on the boss, an arena barrier, a second phase below 50% health with minions, a 3-minute timer, "

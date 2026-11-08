@@ -38,7 +38,15 @@ public final class ClientSetup {
         MinecraftForge.EVENT_BUS.register(HudLayer.class);
         MinecraftForge.EVENT_BUS.register(AreaView.class);
         MinecraftForge.EVENT_BUS.register(Cinematics.class);
-        if (DevVisualTest.enabled()) MinecraftForge.EVENT_BUS.register(DevVisualTest.class);
+        MinecraftForge.EVENT_BUS.register(UiScale.class);
+        // Development-only screenshot test; the class is not shipped in the release jar.
+        if (System.getProperty("csq.devtest") != null) {
+            try {
+                MinecraftForge.EVENT_BUS.register(Class.forName("csequencer.client.DevVisualTest"));
+            } catch (ClassNotFoundException ignored) {
+                // not available outside the development environment
+            }
+        }
     }
 
     private static void onKeys(RegisterKeyMappingsEvent e) {

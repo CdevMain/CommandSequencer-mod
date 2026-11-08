@@ -12,7 +12,7 @@ import java.util.Locale;
 import java.util.function.Consumer;
 
 /** Searchable modal list (optionally grouped) returning one value to its parent. */
-public final class PickerScreen extends Screen {
+public final class PickerScreen extends Screen implements csequencer.client.UiScale.Scaled {
     public record Option(String label, String sub, String value, int color, String group) {
         public Option(String label, String sub, String value) { this(label, sub, value, Theme.MUTED, ""); }
         public Option(String label, String sub, String value, int color) { this(label, sub, value, color, ""); }
@@ -121,4 +121,10 @@ public final class PickerScreen extends Screen {
 
     @Override
     public boolean isPauseScreen() { return false; }
+
+    @Override
+    public void resize(net.minecraft.client.Minecraft mc, int w, int h) {
+        int[] sz = csequencer.client.UiScale.onResize(mc);
+        super.resize(mc, sz[0], sz[1]);
+    }
 }

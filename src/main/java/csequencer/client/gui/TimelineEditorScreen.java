@@ -366,7 +366,16 @@ public final class TimelineEditorScreen extends CsqScreen implements ParamForm.H
         PieceCategory c = PieceRegistry.categoryOf(t);
         inspector.title = (c == null ? "" : c.icon() + "  ") + (t == null ? p.type : t.name());
         if (t == null) inspector.label("Unknown piece type — it is kept but will not run", Theme.ERR);
-        else inspector.hint(t.description());
+        else {
+            inspector.hint(t.description());
+            csequencer.core.pieces.PieceHelp.Help help = csequencer.core.pieces.PieceHelp.of(t.id());
+            if (help != null) {
+                inspector.label("How to use", Theme.SUB);
+                inspector.hint(help.howTo());
+                inspector.label("Example", Theme.SUB);
+                inspector.hint(help.example());
+            }
+        }
         if (report != null) for (Validator.Issue i : report.forPiece(p.id))
             inspector.label((i.severity() == Validator.Severity.ERROR ? "✘ " : "⚠ ") + i.message(), i.severity() == Validator.Severity.ERROR ? Theme.ERR : Theme.WARN);
         if (t != null && t.hasConditionParam())
@@ -1217,7 +1226,7 @@ public final class TimelineEditorScreen extends CsqScreen implements ParamForm.H
                 if (hov) g.fill(x + 2, y, w - 3, y + PAL_ROW, Theme.HOVER);
                 Theme.dot(g, x + 10, y + 5, t.color());
                 g.drawString(font, Theme.clip(font, t.name(), w - 26), x + 19, y + 4, hov ? Theme.TEXT : Theme.TEXT_DIM, false);
-                if (hov) tipArea(x, y, w, PAL_ROW, () -> t.name() + "\n" + t.description() + "\nDrag onto a track, or click to add at the playhead");
+                if (hov) tipArea(x, y, w, PAL_ROW, () -> t.name() + "\n" + t.description() + (csequencer.core.pieces.PieceHelp.of(t.id()) == null ? "" : "\n\nExample: " + csequencer.core.pieces.PieceHelp.of(t.id()).example()) + "\n\nDrag onto a track, or click to add at the playhead");
                 y += PAL_ROW;
             }
         }
@@ -1291,7 +1300,7 @@ public final class TimelineEditorScreen extends CsqScreen implements ParamForm.H
             if (hov) g.fill(x + 2, y, x + w - 2, y + PAL_ROW, Theme.HOVER);
             Theme.dot(g, x + 9, y + 5, pt.color());
             g.drawString(font, Theme.clip(font, pt.name(), w - 24), x + 18, y + 4, hov ? Theme.TEXT : Theme.TEXT_DIM, false);
-            if (hov) tipArea(x, y, w, PAL_ROW, () -> pt.name() + "\n" + pt.description() + "\nDrag onto a track, or click to add at the playhead");
+            if (hov) tipArea(x, y, w, PAL_ROW, () -> pt.name() + "\n" + pt.description() + (csequencer.core.pieces.PieceHelp.of(pt.id()) == null ? "" : "\n\nExample: " + csequencer.core.pieces.PieceHelp.of(pt.id()).example()) + "\n\nDrag onto a track, or click to add at the playhead");
             y += PAL_ROW;
         }
         g.disableScissor();

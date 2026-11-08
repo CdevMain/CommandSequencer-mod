@@ -31,6 +31,8 @@ public final class ClientConfig {
     public static int editorSnap = 5;
     /** Editor Pieces panel: 0 = expanded, 1 = icon rail, 2 = hidden. */
     public static int paletteMode = 0;
+    /** Size of Command Sequencer screens: 0 = auto (roomy), 1 = same as Minecraft, 2 = compact. */
+    public static int uiSize = 0;
     /** Words scattered on screen by the "insanity" Screen Effect+ when the piece does not set its own. */
     public static java.util.List<String> insanityWords = new java.util.ArrayList<>(java.util.List.of(
             "RUN", "THEY SEE YOU", "WAKE UP", "NOT REAL", "BEHIND YOU", "HELP ME", "IT'S COMING", "DON'T LOOK",
@@ -59,6 +61,7 @@ public final class ClientConfig {
             downloadAudio = J.b(o, "downloadAudio", downloadAudio);
             editorSnap = clamp(J.i(o, "editorSnap", editorSnap), 0, 200);
             paletteMode = clamp(J.i(o, "paletteMode", paletteMode), 0, 2);
+            uiSize = clamp(J.i(o, "uiSize", uiSize), 0, 2);
             if (o.has("insanityWords")) {
                 java.util.List<String> w = new java.util.ArrayList<>();
                 for (String s : J.strings(o, "insanityWords")) if (!s.isBlank() && w.size() < 200) w.add(s.length() > 60 ? s.substring(0, 60) : s);
@@ -85,6 +88,7 @@ public final class ClientConfig {
         o.addProperty("downloadAudio", downloadAudio);
         o.addProperty("editorSnap", editorSnap);
         o.addProperty("paletteMode", paletteMode);
+        o.addProperty("uiSize", uiSize);
         o.add("insanityWords", J.toArray(insanityWords));
         try {
             FileProjectStore.writeAtomic(path(), J.PRETTY.toJson(o));

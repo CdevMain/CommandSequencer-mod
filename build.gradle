@@ -88,7 +88,7 @@ minecraft {
             property 'forge.enabledGameTestNamespaces', mod_id
             // Dev only: ./gradlew runClient -PcsqQuickPlay="World" -PcsqDevTest  (joins the world and screenshots camera/effects)
             if (project.hasProperty('csqQuickPlay')) args '--quickPlaySingleplayer', project.property('csqQuickPlay')
-            if (project.hasProperty('csqDevTest')) property 'csq.devtest', 'true'
+            if (project.hasProperty('csqDevTest')) property 'csq.devtest', (project.property('csqDevTest') ?: 'all').toString() ?: 'all'
         }
 
         server {
@@ -205,6 +205,10 @@ tasks.named('shadowJar').configure {
     archiveClassifier = ''
     configurations = [project.configurations.shade]
     relocate 'javazoom', 'csequencer.shadow.javazoom'
+    // Keep the release jar lean: only the MP3 decoder is used, and the dev-only test code stays out.
+    exclude 'javazoom/jl/player/**', 'javazoom/jl/converter/**', 'csequencer/shadow/javazoom/jl/player/**',
+            'csequencer/shadow/javazoom/jl/converter/**', 'META-INF/maven/**',
+            'csequencer/client/DevVisualTest*', 'csequencer/forge/CSQGameTests*', 'data/csequencer/structures/**'
     manifest.inheritFrom tasks.jar.manifest
     finalizedBy 'reobfShadowJar'
 }

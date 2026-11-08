@@ -58,6 +58,11 @@ public final class DevVisualTest {
             }
         });
         steps.add(new Step("setup", () -> {}, 40));
+        String mode = String.valueOf(System.getProperty("csq.devtest"));
+        if (mode.contains("ui")) {
+            uiSteps(mc);
+            if (!mode.contains("fx")) return;
+        }
         steps.add(new Step("baseline", () -> {}, 20));
         for (String fx : new String[]{"dizzy", "sleep", "heat", "cold", "poison", "insanity", "invert", "melt", "grayscale", "blood"}) {
             steps.add(new Step("fx_" + fx, () -> Cinematics.onMessage("effect", "show", "dev:" + fx, effect(fx)), fx.equals("blood") ? 100 : 20));
@@ -96,6 +101,39 @@ public final class DevVisualTest {
         steps.add(new Step("cam_reset", () -> Cinematics.onMessage("camera", "hide", "dev:cam", new JsonObject()), 10));
     }
 
+    /** Opens every screen once (with an example project in the editor) so each can be screenshotted. */
+    private static void uiSteps(Minecraft mc) {
+        var boss = csequencer.core.json.ProjectCodec.read(csequencer.core.json.ProjectCodec.write(csequencer.core.examples.Examples.bossFight())).project();
+        steps.add(new Step("ui_hub", () -> mc.setScreen(new csequencer.client.gui.HubScreen()), 25));
+        steps.add(new Step("ui_projects", () -> mc.setScreen(new csequencer.client.gui.ProjectBrowserScreen(null)), 40));
+        steps.add(new Step("ui_editor", () -> mc.setScreen(csequencer.client.gui.TimelineEditorScreen.open(boss, null)), 30));
+        steps.add(new Step("ui_project_settings", () -> mc.setScreen(new csequencer.client.gui.ProjectSettingsScreen(
+                csequencer.client.gui.TimelineEditorScreen.current(), csequencer.client.gui.TimelineEditorScreen.current())), 25));
+        steps.add(new Step("ui_library", () -> mc.setScreen(new csequencer.client.gui.PieceLibraryScreen(null, t -> {})), 25));
+        steps.add(new Step("ui_library_selected", () -> {
+            try {
+                var f = csequencer.client.gui.PieceLibraryScreen.class.getDeclaredField("list");
+                f.setAccessible(true);
+                Object list = f.get(mc.screen);
+                var sel = list.getClass().getDeclaredField("selected");
+                sel.setAccessible(true);
+                sel.setInt(list, 8);
+            } catch (ReflectiveOperationException ex) {
+                CommandSequencerMod.LOGGER.warn("[CSQ devtest] could not select a piece: {}", ex.toString());
+            }
+        }, 10));
+        steps.add(new Step("ui_logic", () -> {
+            JsonObject g = new JsonObject();
+            for (var pc : boss.main.pieces) if (pc.params.has("condition") && pc.params.get("condition").isJsonObject()) { g = pc.params.getAsJsonObject("condition"); break; }
+            mc.setScreen(new csequencer.client.gui.LogicGraphScreen(null, boss, "Example condition", g, x -> {}));
+        }, 25));
+        steps.add(new Step("ui_tasks", () -> mc.setScreen(new csequencer.client.gui.TaskManagerScreen(null)), 30));
+        steps.add(new Step("ui_monitor", () -> mc.setScreen(new csequencer.client.gui.MonitorScreen(null)), 30));
+        steps.add(new Step("ui_history", () -> mc.setScreen(new csequencer.client.gui.HistoryScreen(null)), 25));
+        steps.add(new Step("ui_settings", () -> mc.setScreen(new csequencer.client.gui.SettingsScreen(null)), 25));
+        steps.add(new Step("ui_close", () -> mc.setScreen(null), 5));
+    }
+
     private static String pendingShot;
     private static boolean shotTaken;
 
@@ -114,14 +152,15 @@ public final class DevVisualTest {
     public static void onTick(TickEvent.ClientTickEvent e) {
         if (e.phase != TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.level == null || mc.screen != null) return;
+        if (mc.player == null || mc.level == null) return;
+        if (steps.isEmpty() && mc.screen != null) return;
         if (++ticksInWorld < 160) return;
         if (steps.isEmpty()) build();
         if (pendingShot != null) return; // wait for the screenshot of the current step
         if (stepIndex < 0 || ++stepTicks >= steps.get(stepIndex).waitTicks) {
             if (stepIndex >= 0 && !shotTaken) {
                 String name = steps.get(stepIndex).name;
-                if (!name.startsWith("clear_") && !name.equals("setup")) { pendingShot = name; shotTaken = true; return; }
+                if (!name.startsWith("clear_") && !name.equals("setup") && !name.equals("ui_close")) { pendingShot = name; shotTaken = true; return; }
             }
             shotTaken = false;
             stepIndex++;

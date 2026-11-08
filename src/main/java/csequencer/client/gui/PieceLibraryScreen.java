@@ -137,6 +137,17 @@ public final class PieceLibraryScreen extends CsqScreen {
         iy += 16;
         for (var line : font.split(Component.literal(t.description()), cw)) { g.drawString(font, line, ix, iy, Theme.TEXT_DIM, false); iy += 10; }
         iy += 6;
+        csequencer.core.pieces.PieceHelp.Help help = csequencer.core.pieces.PieceHelp.of(t.id());
+        if (help != null) {
+            Theme.section(g, font, "How to use", ix, iy, cw);
+            iy += 13;
+            for (var line : font.split(Component.literal(help.howTo()), cw)) { g.drawString(font, line, ix, iy, Theme.TEXT, false); iy += 10; }
+            iy += 4;
+            Theme.section(g, font, "Example", ix, iy, cw);
+            iy += 13;
+            for (var line : font.split(Component.literal(help.example()), cw)) { g.drawString(font, line, ix, iy, 0xFF9FD8A8, false); iy += 10; }
+            iy += 6;
+        }
         if (!supported(t)) { g.drawString(font, "✘ Not available on this server", ix, iy, Theme.ERR, false); iy += 12; }
         if (t.privileged()) { g.drawString(font, "⚠ Runs only in projects saved by trusted players", ix, iy, Theme.WARN, false); iy += 12; }
         Theme.section(g, font, "Parameters", ix, iy, cw);
@@ -148,6 +159,10 @@ public final class PieceLibraryScreen extends CsqScreen {
             String right = p.type.name().toLowerCase(Locale.ROOT).replace('_', ' ') + (def.isEmpty() ? "" : " = " + def);
             g.drawString(font, Theme.clip(font, right, cw / 2 - 4), ix + cw / 2 + 4, iy, Theme.MUTED, false);
             iy += 11;
+            if (p.help != null && !p.help.isEmpty() && iy < height - 30) {
+                g.drawString(font, Theme.clip(font, "  " + p.help, cw), ix, iy, Theme.MUTED, false);
+                iy += 10;
+            }
         }
         if (t.params().isEmpty()) g.drawString(font, "No parameters", ix, iy, Theme.MUTED, false);
         g.drawString(font, "id: " + t.id(), ix, height - 18, Theme.MUTED, false);

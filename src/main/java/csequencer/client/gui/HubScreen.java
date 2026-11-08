@@ -26,7 +26,7 @@ public final class HubScreen extends CsqScreen {
             new Card(Tab.SETTINGS, "settings", "Settings", "Overlay, audio, permissions and limits"),
     };
     /** Texture size of the placeholder images (used for UV mapping; real art may be any 4:3 size). */
-    private static final int TEX_W = 128, TEX_H = 96, LABEL_H = 14, GAP = 10;
+    private static final int TEX_W = 128, TEX_H = 96, LABEL_H = 24, GAP = 10, FOOTER = 16;
 
     public HubScreen() { super("Command Sequencer", null); }
 
@@ -41,7 +41,7 @@ public final class HubScreen extends CsqScreen {
     /** Image width: as big as fits, capped at 2× the texture, kept as whole pixels of the 4:3 art. */
     private int imgW() {
         int byWidth = (width - 20 - (cols() - 1) * GAP) / cols();
-        int byHeight = (int) (((height - 20 - (rows() - 1) * GAP) / (double) rows() - LABEL_H) * 4 / 3);
+        int byHeight = (int) (((height - 20 - FOOTER - (rows() - 1) * GAP) / (double) rows() - LABEL_H) * 4 / 3);
         int w = Math.min(Math.min(byWidth, byHeight), TEX_W * 2);
         return Math.max(48, w - w % 4);
     }
@@ -55,7 +55,7 @@ public final class HubScreen extends CsqScreen {
         int rowW = inRow * w + (inRow - 1) * GAP;
         int x = (width - rowW) / 2 + (i % cols) * (w + GAP);
         int gridH = rows() * h + (rows() - 1) * GAP;
-        int y = (height - gridH) / 2 + row * (h + GAP);
+        int y = (height - FOOTER - gridH) / 2 + row * (h + GAP);
         return new int[]{x, y};
     }
 
@@ -80,10 +80,13 @@ public final class HubScreen extends CsqScreen {
                 g.fill(x - 1, y + h, x + w + 1, y + h + 1, 0xFFFFFFFF);
                 g.fill(x - 1, y, x, y + h, 0xFFFFFFFF);
                 g.fill(x + w, y, x + w + 1, y + h, 0xFFFFFFFF);
-                tipArea(p[0], p[1], w, h + LABEL_H, c::tip);
             }
-            g.drawCenteredString(font, c.title, x + w / 2, y + h + 4, hov ? Theme.TEXT : Theme.TEXT_DIM);
+            g.drawCenteredString(font, c.title, x + w / 2, y + h + 3, hov ? Theme.TEXT : Theme.TEXT_DIM);
+            String sub = Theme.clip(font, c.tip, w + GAP - 2);
+            g.drawString(font, sub, x + w / 2 - font.width(sub) / 2, y + h + 13, Theme.MUTED, false);
         }
+        String hint = "New here? Projects → open \"Tutorial 1 · Basics\" and press ▶ Run.   K opens this screen anywhere.";
+        g.drawCenteredString(font, Theme.clip(font, hint, width - 10), width / 2, height - 13, Theme.SUB);
     }
 
     @Override

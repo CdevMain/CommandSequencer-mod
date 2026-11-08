@@ -13,6 +13,8 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -44,27 +46,51 @@ public final class SettingsScreen extends CsqScreen {
         else buildServer();
     }
 
+    private final List<int[]> sectionPos = new ArrayList<>();
+    private final List<String> sectionNames = new ArrayList<>();
+
+    private void section(String name, int x, int y) {
+        sectionNames.add(name);
+        sectionPos.add(new int[]{x, y});
+    }
+
     private void buildPersonal() {
-        int x = 20, y = HEADER + 36, w = 200, dy = 22;
-        btn("Overlay: " + (ClientConfig.overlayEnabled ? "shown" : "hidden"), x, y, w, 20, () -> { ClientConfig.overlayEnabled = !ClientConfig.overlayEnabled; save(); }); y += dy;
-        btn("Style: " + (ClientConfig.collapsed ? "compact" : "full"), "Compact shows one line per sequence", x, y, w, 20, () -> { ClientConfig.collapsed = !ClientConfig.collapsed; save(); }); y += dy;
-        btn("Position: " + ClientConfig.position.name().toLowerCase(Locale.ROOT).replace('_', ' '), x, y, w, 20, () -> {
+        sectionNames.clear();
+        sectionPos.clear();
+        boolean two = width >= 430;
+        int w = two ? Math.min(210, (width - 50) / 2) : Math.min(260, width - 40), dy = 21;
+        int x = two ? Math.max(14, (width - 2 * w - 20) / 2) : (width - w) / 2, y = HEADER + 40;
+        section("Top-of-screen overlay", x, y - 11);
+        btn("Overlay: " + (ClientConfig.overlayEnabled ? "shown" : "hidden"), "The bar at the top that shows running sequences and their phases", x, y, w, 19, () -> { ClientConfig.overlayEnabled = !ClientConfig.overlayEnabled; save(); }); y += dy;
+        btn("Style: " + (ClientConfig.collapsed ? "compact" : "full"), "Compact shows one line per sequence", x, y, w, 19, () -> { ClientConfig.collapsed = !ClientConfig.collapsed; save(); }); y += dy;
+        btn("Position: " + ClientConfig.position.name().toLowerCase(Locale.ROOT).replace('_', ' '), "Where the overlay sits on the screen", x, y, w, 19, () -> {
             ClientConfig.position = ClientConfig.Position.values()[(ClientConfig.position.ordinal() + 1) % ClientConfig.Position.values().length]; save(); }); y += dy;
-        btn("Scale: " + String.format(Locale.ROOT, "%.2f", ClientConfig.scale), x, y, w, 20, () -> { ClientConfig.scale = ClientConfig.scale >= 1.75 ? 0.5 : ClientConfig.scale + 0.25; save(); }); y += dy;
-        btn("Opacity: " + Math.round(ClientConfig.opacity * 100) + "%", x, y, w, 20, () -> { ClientConfig.opacity = ClientConfig.opacity >= 0.99 ? 0.3 : Math.min(1, ClientConfig.opacity + 0.1); save(); }); y += dy;
-        btn("Visible: " + (ClientConfig.alwaysVisible ? "whole sequence" : "per sequence setting"), "Force the overlay to stay visible for the entire sequence", x, y, w, 20, () -> { ClientConfig.alwaysVisible = !ClientConfig.alwaysVisible; save(); }); y += dy;
-        int x2 = x + w + 20; y = HEADER + 36;
-        btn("Show for: " + ClientConfig.displaySeconds + "s after a change", x2, y, w, 20, () -> { ClientConfig.displaySeconds = ClientConfig.displaySeconds >= 30 ? 3 : ClientConfig.displaySeconds + 3; save(); }); y += dy;
-        btn("Animations: " + (ClientConfig.animations ? "on" : "off"), x2, y, w, 20, () -> { ClientConfig.animations = !ClientConfig.animations; save(); }); y += dy;
-        btn("Max sequences shown: " + ClientConfig.maxEntries, x2, y, w, 20, () -> { ClientConfig.maxEntries = ClientConfig.maxEntries % 6 + 1; save(); }); y += dy;
-        btn("Offset from top: " + ClientConfig.offsetY + "px", x2, y, w, 20, () -> { ClientConfig.offsetY = ClientConfig.offsetY >= 60 ? 0 : ClientConfig.offsetY + 10; save(); }); y += dy;
-        btn("Sequence audio volume: " + Math.round(ClientConfig.audioVolume * 100) + "%", x2, y, w, 20, () -> { ClientConfig.audioVolume = ClientConfig.audioVolume >= 0.99 ? 0 : Math.min(1, ClientConfig.audioVolume + 0.1); save(); }); y += dy;
-        btn("Download sequence audio: " + (ClientConfig.downloadAudio ? "yes" : "no"), x2, y, w, 20, () -> { ClientConfig.downloadAudio = !ClientConfig.downloadAudio; save(); }); y += dy;
-        btn("Editor snap: " + (ClientConfig.editorSnap == 0 ? "off" : ClientConfig.editorSnap + " ticks"), x2, y, w, 20, () -> {
+        btn("Size: " + String.format(Locale.ROOT, "%.2f", ClientConfig.scale), "Overlay size", x, y, w, 19, () -> { ClientConfig.scale = ClientConfig.scale >= 1.75 ? 0.5 : ClientConfig.scale + 0.25; save(); }); y += dy;
+        btn("Opacity: " + Math.round(ClientConfig.opacity * 100) + "%", "Overlay background opacity", x, y, w, 19, () -> { ClientConfig.opacity = ClientConfig.opacity >= 0.99 ? 0.3 : Math.min(1, ClientConfig.opacity + 0.1); save(); }); y += dy;
+        btn("Visible: " + (ClientConfig.alwaysVisible ? "whole sequence" : "per sequence setting"), "Force the overlay to stay visible for the entire sequence", x, y, w, 19, () -> { ClientConfig.alwaysVisible = !ClientConfig.alwaysVisible; save(); }); y += dy;
+        btn("Show for: " + ClientConfig.displaySeconds + "s after a change", "How long the overlay stays after a phase change", x, y, w, 19, () -> { ClientConfig.displaySeconds = ClientConfig.displaySeconds >= 30 ? 3 : ClientConfig.displaySeconds + 3; save(); }); y += dy;
+        btn("Max sequences shown: " + ClientConfig.maxEntries, "How many running sequences the overlay lists", x, y, w, 19, () -> { ClientConfig.maxEntries = ClientConfig.maxEntries % 6 + 1; save(); }); y += dy;
+        btn("Offset from top: " + ClientConfig.offsetY + "px", "Move the overlay down (e.g. under other mods' bars)", x, y, w, 19, () -> { ClientConfig.offsetY = ClientConfig.offsetY >= 60 ? 0 : ClientConfig.offsetY + 10; save(); }); y += dy;
+        btn("Animations: " + (ClientConfig.animations ? "on" : "off"), "Slide and fade animations of the overlay", x, y, w, 19, () -> { ClientConfig.animations = !ClientConfig.animations; save(); }); y += dy;
+        if (two) { x = x + w + 20; y = HEADER + 40; } else y += 14;
+        section("Audio", x, y - 11);
+        btn("Sequence audio volume: " + Math.round(ClientConfig.audioVolume * 100) + "%", "Volume of music played by sequences (not the normal game sounds)", x, y, w, 19, () -> { ClientConfig.audioVolume = ClientConfig.audioVolume >= 0.99 ? 0 : Math.min(1, ClientConfig.audioVolume + 0.1); save(); }); y += dy;
+        btn("Download sequence audio: " + (ClientConfig.downloadAudio ? "yes" : "no"), "Turn off to never download music from servers", x, y, w, 19, () -> { ClientConfig.downloadAudio = !ClientConfig.downloadAudio; save(); }); y += dy + 14;
+        section("Editor & screens", x, y - 11);
+        btn("Interface size: " + csequencer.client.UiScale.MODES[ClientConfig.uiSize], "Auto gives these screens enough room even with a large GUI scale.\nCompact fits even more. The game HUD and your Minecraft GUI scale do not change.", x, y, w, 19, () -> {
+            ClientConfig.uiSize = (ClientConfig.uiSize + 1) % csequencer.client.UiScale.MODES.length;
+            ClientConfig.save();
+            minecraft.setScreen(new SettingsScreen(parent));
+        }); y += dy;
+        btn("Editor snap: " + (ClientConfig.editorSnap == 0 ? "off" : ClientConfig.editorSnap + " ticks"), "Pieces snap to this grid when dragged (hold Shift to ignore)", x, y, w, 19, () -> {
             int[] steps = {0, 1, 5, 10, 20, 40};
             int i = 0;
             while (i < steps.length && steps[i] != ClientConfig.editorSnap) i++;
             ClientConfig.editorSnap = steps[(i + 1) % steps.length];
+            save();
+        }); y += dy;
+        btn("Pieces panel: " + new String[]{"full list", "icon rail", "hidden"}[ClientConfig.paletteMode], "The list of pieces on the left of the editor (P in the editor)", x, y, w, 19, () -> {
+            ClientConfig.paletteMode = (ClientConfig.paletteMode + 1) % 3;
             save();
         });
     }
@@ -148,7 +174,8 @@ public final class SettingsScreen extends CsqScreen {
     @Override
     protected void drawContent(GuiGraphics g, int mx, int my, float pt) {
         if (!serverTab) {
-            g.drawString(font, "Personal preferences are stored on this computer (config/csequencer-client.json).", 20, height - 20, Theme.SUB, false);
+            for (int i = 0; i < sectionNames.size(); i++) g.drawString(font, sectionNames.get(i).toUpperCase(Locale.ROOT), sectionPos.get(i)[0], sectionPos.get(i)[1], Theme.SUB, false);
+            g.drawString(font, Theme.clip(font, "Saved on this computer: config/csequencer-client.json", width - 20), 10, height - 12, Theme.MUTED, false);
             return;
         }
         if (ClientState.serverSettings == null) { g.drawCenteredString(font, "Loading server settings…", width / 2, HEADER + 60, Theme.SUB); return; }

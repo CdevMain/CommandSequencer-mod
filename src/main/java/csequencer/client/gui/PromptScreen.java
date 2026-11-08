@@ -10,7 +10,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.function.Consumer;
 
 /** Modal single-line text prompt that returns to its parent. */
-public final class PromptScreen extends Screen {
+public final class PromptScreen extends Screen implements csequencer.client.UiScale.Scaled {
     private final Screen parent;
     private final String message, initial;
     private final Consumer<String> onOk;
@@ -60,4 +60,10 @@ public final class PromptScreen extends Screen {
 
     @Override
     public boolean isPauseScreen() { return false; }
+
+    @Override
+    public void resize(net.minecraft.client.Minecraft mc, int w, int h) {
+        int[] sz = csequencer.client.UiScale.onResize(mc);
+        super.resize(mc, sz[0], sz[1]);
+    }
 }

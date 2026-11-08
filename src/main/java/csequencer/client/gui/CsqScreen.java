@@ -19,7 +19,7 @@ import java.util.function.Supplier;
  * popup menus (right-click / dropdowns), tooltips and themed widget helpers.
  * Never pauses the game (multiplayer safe).
  */
-public abstract class CsqScreen extends Screen {
+public abstract class CsqScreen extends Screen implements csequencer.client.UiScale.Scaled {
     public static final int HEADER = 24;
     protected final Screen parent;
     private final List<Component> tooltip = new ArrayList<>();
@@ -220,6 +220,12 @@ public abstract class CsqScreen extends Screen {
 
     @Override
     public boolean isPauseScreen() { return false; }
+
+    @Override
+    public void resize(net.minecraft.client.Minecraft mc, int w, int h) {
+        int[] s = csequencer.client.UiScale.onResize(mc);
+        super.resize(mc, s[0], s[1]);
+    }
 
     protected static boolean in(double mx, double my, int x, int y, int w, int h) { return mx >= x && mx < x + w && my >= y && my < y + h; }
 }
